@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archaemetry</title>
+<meta name="description" content="Low-cost, field-portable photogrammetry and automated profile drawing for archaeological pottery sherds.">
+<style>
+:root{--bg:#faf8f4;--fg:#1f1d1a;--mut:#6b655c;--card:#fff;--line:#e4dfd5;--acc:#9a4b21;--ok:#2f7d4f;--warn:#b26a00}
+@media (prefers-color-scheme:dark){:root{--bg:#171512;--fg:#ece7de;--mut:#a39c90;--card:#1f1c18;--line:#34302a;--acc:#e08a56;--ok:#5fc08a;--warn:#e0a040}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{padding:56px 0 24px}
+h1{font-size:2.4rem;margin:0 0 8px;letter-spacing:-.02em}
+h2{margin:48px 0 12px;font-size:1.4rem}
+p{margin:0 0 12px}.lead{font-size:1.15rem;color:var(--mut)}
+a{color:var(--acc)}
+.btns a{display:inline-block;margin:8px 8px 0 0;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);text-decoration:none;color:var(--fg)}
+.btns a.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card b{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.92rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mut);font-weight:600}
+.ok{color:var(--ok)}.warn{color:var(--warn)}
+figure{margin:16px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+figure img{max-width:100%;height:auto;display:block;margin:0 auto;background:#fff;border-radius:6px}
+figcaption{color:var(--mut);font-size:.9rem;margin-top:8px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-size:.88rem}
+.note{border-left:3px solid var(--warn);padding:4px 12px;color:var(--mut)}
+footer{margin:56px 0 32px;color:var(--mut);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>archaemetry</h1>
+<p class="lead">A low-cost, field-portable photogrammetry pipeline that turns photos of pottery sherds into metric 3D meshes and publication-style profile drawings.</p>
+<div class="btns">
+<a class="p" href="https://github.com/Amudhan-05/Archaemetry">GitHub repository</a>
+<a href="PROJECT_HANDOFF_v2.md">Project handoff</a>
+<a href="AUTOMATION_VALIDATION.md">Validation write-up</a>
+</div>
+</header>
+
+<h2>What it does</h2>
+<p>For each sherd: a scaled 3D mesh, a cross-section profile drawing (with wall thickness where both surfaces are captured), and for decorated ware a flattened rollout. Proof of concept on a consumer camera, a cardboard light tent and mostly free software, with an upgrade path once funded.</p>
+
+<h2>Pipeline</h2>
+<div class="grid">
+<div class="card"><b>1 · Photogrammetry</b>Images to scaled mesh. GPU stage. ArUco markers + calliper distances set the metric scale. <span class="warn">Not yet scripted.</span></div>
+<div class="card"><b>2 · Cleanup</b>Keeps the largest component by face count, dropping turntable and noise. CPU, scripted.</div>
+<div class="card"><b>3 · Profile</b>Symmetry axis fit (<code>pca</code> or <code>rim_arc</code>), inner/outer wall split, thickness. CPU, scripted.</div>
+<div class="card"><b>4 · Publish</b>Scale bar, caption and 0.3&nbsp;mm line weight as portable SVG. CPU, scripted.</div>
+</div>
+<p style="margin-top:12px">Every run ends with a <b>GO / REVIEW</b> verdict. A fragment whose axis can't be fixed from a clean rim arc is flagged for manual review instead of being silently drawn.</p>
+
+<h2>Example output</h2>
+<figure>
+<img src="validation/example_drawing.png" alt="Half-section profile drawing with 2 cm scale bar" width="420">
+<figcaption>Drawing produced by <code>run.py</code> from a cropped rim fragment. The jagged edges are real mesh noise at the rim and break, which the pipeline does not smooth away.</figcaption>
+</figure>
+
+<h2>Accuracy evidence</h2>
+<p>All numbers are against a known ground truth. They measure the pipeline's geometry, not photogrammetry quality on real sherds.</p>
+<table>
+<tr><th>Test</th><th>Result</th></tr>
+<tr><td>Cleanup on a raw Meshroom mesh</td><td class="ok">710 components → 1, sherd kept</td></tr>
+<tr><td>Complete vessel, analytic ground truth (handle, turntable, noise, tilted 25°)</td><td class="ok">0.018&nbsp;mm RMS, 0.07&nbsp;mm max, in the published SVG</td></tr>
+<tr><td>Rim fragment with ≥ 90° of rim arc</td><td class="ok">0.02–0.06&nbsp;mm RMS (synthetic); 0.35° axis error on the real lekythos crop</td></tr>
+<tr><td>Rim fragment with ~60° of rim arc</td><td class="warn">Refused and flagged REVIEW (1.4&nbsp;mm RMS if forced)</td></tr>
+<tr><td>Wall thickness on a synthetic 6&nbsp;mm shell</td><td class="ok">6.00&nbsp;mm recovered</td></tr>
+<tr><td>Real broken sherds from photographs</td><td class="warn">Not yet validated</td></tr>
+</table>
+<figure>
+<img src="validation/accuracy_vs_arc.png" alt="Axis and radial error against rim arc length for PCA and rim_arc methods">
+<figcaption>Error against rim-arc length on rim wedges cropped from a complete vessel. About 90° of clean rim is the practical threshold.</figcaption>
+</figure>
+
+<h2>Run it</h2>
+<pre>cd scripts
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+python run.py --config config/sherd.example.yaml --input mesh.obj --outdir out/
+python tools/synthetic_validation.py out_check/   # accuracy check, ~30 s, no downloads</pre>
+<p class="note">Linux needs <code>libegl1</code> for Open3D. The whole profile lane is CPU-only.</p>
+
+<h2>Status and next steps</h2>
+<ul>
+<li>Validate on real photographed broken rim sherds.</li>
+<li>Script Stage 1 (COLMAP/Meshroom, masking, ArUco scale).</li>
+<li>Body-sherd axis method, section hatching, packaging (Colab / Docker).</li>
+</ul>
+
+<footer>Code and docs MIT licensed. Captured datasets default to CC BY-NC-SA 4.0. Sample vessel: Zenodo 5102757 (CC-BY-SA-4.0).</footer>
+</div>
+</body>
+</html>

@@ -9,7 +9,7 @@
   function paint() {
     if (!btn) return;
     var t = current();
-    btn.textContent = t === "dark" ? "☀ Light mode" : "☾ Dark mode";
+    btn.textContent = t === "dark" ? "☀" : "☾";
     btn.setAttribute("aria-label", "Switch to " + (t === "dark" ? "light" : "dark") + " mode");
   }
   if (btn) btn.addEventListener("click", function () {

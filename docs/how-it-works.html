@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · archaemetry</title>
+<meta name="description" content="The four stages of the archaemetry pipeline and the maths inside them.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="how-it-works.html" aria-current="page">How it works</a><a href="field-guide.html">Field guide</a><a href="sample-output.html">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>How it works</h1>
+<p class="lead">Photos go in, a scaled drawing and a confidence verdict come out. Stage 1 needs a GPU; stages 2 to 4 run on any CPU.</p></header>
+
+<figure><pre style="margin:0">photos ──▶ [1 SfM/MVS  GPU] ──▶ mesh (mm)
+                                   │
+        [2 clean_mesh] ◀───────────┘   keep the sherd, drop turntable + noise
+              │
+        [3 extract_profile]            find axis → cut profile → thickness
+              │
+        [4 publish_svg]                scale bar, line weight, caption
+              │
+        drawing.svg + run_report.json  → GO or REVIEW</pre></figure>
+
+<h2>Stage 1 · Photogrammetry (GPU)</h2>
+<p>Structure-from-Motion finds the camera positions; Multi-View Stereo builds a dense surface. The dense step is the one that needs a CUDA GPU. The mesh gets its real-world size from printed markers: two markers a known calliper distance apart fix millimetres-per-unit. <span class="tag warn">Manual today</span> The planned wrapper lives in <code>gpu/</code>.</p>
+
+<h2>Stage 2 · Cleanup (<code>clean_mesh.py</code>)</h2>
+<p>A raw mesh contains the sherd, the turntable, the backdrop and floating noise as separate connected pieces. The script keeps the piece with the <b>most triangles</b>. A turntable is a large area built from few triangles; the photographed sherd is a small area built from very many. On the sample mesh this took 710 components down to 1.</p>
+<p>It also reports how much it kept and whether what remains is compact, so a human can spot a bad cleanup.</p>
+
+<h2>Stage 3 · Profile (<code>extract_profile.py</code>)</h2>
+<h3>Why the axis is everything</h3>
+<p>A wheel-thrown pot is a surface of revolution: every horizontal slice is a circle around one vertical axis. If you know the axis, the profile is simply "radius at each height". If the axis is tilted by a few degrees, the radius is wrong by an amount that grows with distance from where you anchored it. So finding the axis is the whole problem for fragments.</p>
+
+<h3>Complete vessels: <code>pca</code></h3>
+<ol>
+<li>Seed the axis with the mesh's longest direction (PCA).</li>
+<li>Slice perpendicular to it, fit a circle to each slice with outlier rejection (so a handle doesn't drag the centre), and refit the axis through all the circle centres. Repeat.</li>
+</ol>
+
+<h3>Rim sherds: <code>rim_arc</code></h3>
+<p>This mirrors the archaeologist's rim chart. The rim and clean breaks are horizontal circular arcs on the mesh border.</p>
+<ol>
+<li>Collect the border vertices (edges used by only one triangle).</li>
+<li>Take the top and bottom height bands and fit a plane and circle to each.</li>
+<li>Accept an arc only if it passes three gates: a clean circle (residual below 0.05), a long enough arc (at least 70°), and nearly planar (planarity below 0.12, which rejects a flared mouth).</li>
+<li>Use the best arc's plane normal as the axis.</li>
+<li>If no arc passes, <b>fall back and flag the sherd</b> rather than guess.</li>
+</ol>
+
+<h3>Cutting the profile</h3>
+<p>Every vertex is expressed as height along the axis and distance from it. The height range is split into bands (300 by default). In each band the <b>median</b> radius is the wall. Median rather than mean or maximum, because a handle covers only a minority of the circumference and the median ignores it.</p>
+
+<h3>Wall thickness</h3>
+<p>For a sherd that captured both surfaces, each band's radii form two clusters. A one-dimensional Otsu threshold splits them into an inner and outer wall and thickness is the gap. A mesh with only an outer surface is a single cluster and correctly reports no thickness.</p>
+
+<h2>Stage 4 · Publish (<code>publish_svg.py</code>)</h2>
+<p>Plain SVG editing, no GUI: adds a metric scale bar, a caption and the 0.3&nbsp;mm line weight. The profile geometry is not touched; the test suite checks that polylines and scale are identical before and after.</p>
+
+<h2>The verdict</h2>
+<div class="tablewrap"><table>
+<tr><th>Signal</th><th>Meaning</th><th>Effect</th></tr>
+<tr><td><code>rim_arc</code> fell back to PCA</td><td>No clean rim arc of at least 70°</td><td><span class="tag warn">REVIEW</span></td></tr>
+<tr><td>Mean angular coverage below 0.25</td><td>Under a quarter of the circumference is present</td><td><span class="tag warn">REVIEW</span></td></tr>
+<tr><td>Neither</td><td>Axis fixed from real evidence</td><td><span class="tag ok">GO</span></td></tr>
+</table></div>
+<div class="callout"><b>Honest limit.</b> GO means the method was able to fix the axis, not that the answer was checked against reality. Real-sherd validation is still outstanding.</div>
+
+<h2>What the numbers rest on</h2>
+<p>An error-vs-truth oracle crops wedges of increasing width from a complete vessel with a known axis, runs the pipeline on each, and measures axis angle and radial error directly, with no alignment heuristic. A second test builds a vessel with an exactly known profile and reads the published SVG back to compare against it. See <a href="sample-output.html">sample output</a>.</p>
+
+<div class="pager"><a class="btn" href="proposal.html">← Proposal</a><a class="btn" href="field-guide.html">Field guide →</a></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

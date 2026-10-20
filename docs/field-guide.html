@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field guide · archaemetry</title>
+<meta name="description" content="How to capture, run and read the result of the archaemetry pipeline.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="how-it-works.html">How it works</a><a href="field-guide.html" aria-current="page">Field guide</a><a href="sample-output.html">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>Field guide</h1>
+<p class="lead">From sherd on the table to a drawing you can trust, and what to do when the tool says REVIEW.</p></header>
+
+<h2>1 · Before you shoot</h2>
+<ul>
+<li><b>Pick sherds that suit the automatic lane.</b> Best: complete or large vessels, and rim sherds showing roughly a quarter of the circle or more (at least about 90° of clean rim). Send small rim pieces, body sherds and decorated fine ware to manual review or the GigaMesh station.</li>
+<li><b>Set up the rig once.</b> Light tent with two identical 6500&nbsp;K lamps, fixed distance and angle. Matte turntable marked in 10° steps. For slipped or glossy ware, use cross-polarised light.</li>
+<li><b>Lock the camera.</b> Lowest ISO, white balance set manually (never Auto), zoom fixed for the whole session, 2-second timer or remote.</li>
+<li><b>Grey card first.</b> Shoot an 18% grey card at the start of every session; check R=G=B and match the recorded brightness before placing the sherd.</li>
+</ul>
+
+<h2>2 · Scale markers</h2>
+<p>All metric accuracy comes from here. Print 6–10 matte ArUco markers (3–5&nbsp;cm). Put four flat around the sherd and two on angled card tents so they stay visible at high elevation. Measure distances between marker pairs with a digital calliper and record them in <code>data/reference/marker-measurements.csv</code>.</p>
+
+<h2>3 · Capture</h2>
+<ol class="steps">
+<li>Photograph a legible sherd ID first.</li>
+<li>Three elevation rings, camera fixed per ring, turntable turned 10° each shot: low (~15–20°), mid (~45°), high (~70°), then 1–3 overhead shots. That is about 80–150 images.</li>
+<li>Keep 60–70% overlap. If reconstruction fails for lack of overlap, redo at 5° steps.</li>
+<li><b>If you want wall thickness,</b> make sure both the inner and outer surfaces are visible. An exterior-only scan gives a single outline and no thickness.</li>
+<li>For the underside, prop the sherd about 45° on clay and shoot a second session, then merge.</li>
+</ol>
+
+<h2>4 · Reconstruct</h2>
+<p>Run photogrammetry (RealityCapture or Meshroom today), set scale from the marker distances, mask the background, and export an OBJ or PLY <b>in millimetres</b>. Save the unedited export as <code>sherd_ID_raw.obj</code> and never overwrite it.</p>
+
+<h2>5 · Run the pipeline</h2>
+<pre><code>cd cpu
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+python run.py --config config/sherd.example.yaml --input sherd.obj --outdir out/</code></pre>
+<p>Set <code>axis_method</code> to <code>pca</code> for complete vessels or <code>rim_arc</code> for rim sherds. Linux needs <code>libegl1</code> for Open3D. Work under a path without spaces.</p>
+<p>Outputs: <code>out/drawing.svg</code> (the drawing), <code>out/run_report.json</code> (numbers and verdict), <code>out/clean.obj</code>, and <code>out/profile/profile_overlay.png</code> for a visual check.</p>
+
+<h2>6 · Read the result</h2>
+<div class="tablewrap"><table>
+<tr><th>You see</th><th>It means</th><th>Do this</th></tr>
+<tr><td><span class="tag ok">GO</span></td><td>Axis fixed from a clean rim arc or a near-complete vessel</td><td>Glance at the overlay, then finish in Inkscape if needed</td></tr>
+<tr><td><span class="tag warn">REVIEW</span> rim arc fell back</td><td>Too little clean rim to trust an automatic axis</td><td>Route to GigaMesh or set the axis and diameter by hand</td></tr>
+<tr><td><span class="tag warn">REVIEW</span> low coverage</td><td>Less than a quarter of the circumference captured</td><td>Re-shoot, or treat as a manual drawing</td></tr>
+<tr><td><code>wall_thickness_mm: null</code></td><td>Only one surface in the mesh</td><td>Not an error; re-capture with the interior visible if thickness matters</td></tr>
+<tr><td><code>kept_fraction</code> unexpectedly low</td><td>Cleanup discarded a lot</td><td>Open <code>clean.obj</code> and check the sherd is intact</td></tr>
+</table></div>
+
+<h2>7 · Quick sanity checks</h2>
+<ul>
+<li>Is the scale bar plausible against the physical sherd and the calliper?</li>
+<li>In the overlay, is the outline smooth apart from real features? Spikes usually mean leftover background or a bad axis.</li>
+<li>Is the rim radius sensible for the vessel type?</li>
+</ul>
+
+<h2>8 · Archive</h2>
+<p>Keep RAW files forever if the camera has them. The unedited <code>_raw.obj</code> is the 3D equivalent of a site photograph. Share via Zenodo (free DOI) or Sketchfab. Default licence for captured data: CC BY-NC-SA 4.0 unless the museum specifies otherwise.</p>
+
+<div class="pager"><a class="btn" href="how-it-works.html">← How it works</a><a class="btn" href="sample-output.html">Sample output →</a></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

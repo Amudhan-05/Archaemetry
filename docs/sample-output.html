@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample output · archaemetry</title>
+<meta name="description" content="A real pipeline run, the drawing it produced, and its error against known truth.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="sample-output.html" aria-current="page">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>Sample output</h1>
+<p class="lead">What a run produces, and how close it gets to the known answer.</p></header>
+
+<div class="callout warn"><b>Read this first.</b> These samples come from test geometry with a known answer (a synthetic vessel, and a vessel cropped from an open museum scan). They show the processing is correct. They are <b>not</b> a result from a photographed sherd.</div>
+
+<h2>A full run, start to finish</h2>
+<p>Input: a synthetic vessel mesh with a handle, a turntable disc, 40 noise islands and 0.05&nbsp;mm surface noise, 43 components in all. One command produced everything below.</p>
+<pre><code>python run.py --config cfg.yaml --input vessel.ply --outdir out/</code></pre>
+
+<h3>The drawing</h3>
+<figure>
+<img src="validation/sample_drawing.svg" alt="Half-section profile drawing of the test vessel with scale bar" style="max-height:560px">
+<figcaption><code>drawing.svg</code>: both halves of the outline, dashed centre line, scale bar, caption. Exterior-only data, so one wall line per side. The handle was a separate piece of the test mesh, so cleanup removed it before profiling.</figcaption>
+</figure>
+
+<h3>The report</h3>
+<pre><code>{
+  "input": "synthetic_vessel_with_handle_turntable_noise.ply",
+  "verdict": "GO",
+  "flags": [],
+  "cleanup": {
+    "components_before": 43,
+    "kept_fraction": 0.9952,
+    "compactness_ratio": 0.387
+  },
+  "profile": {
+    "axis_method": "pca",
+    "axis_dir": [
+      -0.0,
+      -1.0,
+      0.0
+    ],
+    "height_mm": 113.62,
+    "max_radius_mm": 21.996,
+    "mean_angular_coverage": 1.0,
+    "wall_thickness_mm": null
+  },
+  "outputs": {
+    "clean": "clean.obj",
+    "drawing": "drawing.svg"
+  }
+}</code></pre>
+<p>Cleanup went from 43 components to 1 and kept 99.5% of the faces. The axis came out vertical, coverage was complete, and the verdict is GO.</p>
+
+<h2>How close is the drawing to the truth?</h2>
+<p>The drawing is read back from the published SVG and compared to the analytic profile used to build the vessel.</p>
+<figure>
+<img src="validation/sample_vs_truth.png" alt="Drawn profile overlaid on ground truth and radius error in micrometres">
+<figcaption>Left: drawn profile over truth (they coincide at this scale). Right: error in micrometres. The largest deviations sit at the sharp shoulder near 80&nbsp;mm, where a 300-band average rounds a corner.</figcaption>
+</figure>
+
+<h2>Accuracy across test cases</h2>
+<div class="tablewrap"><table>
+<tr><th>Case</th><th>Radial RMS</th><th>Max</th><th>Verdict</th></tr>
+<tr><td>Complete vessel, handle, turntable, noise</td><td>0.018 mm</td><td>0.074 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Same, tilted 25°</td><td>0.018 mm</td><td>0.074 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Rim sherd, 360° arc</td><td>0.026 mm</td><td>0.079 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Rim sherd, 180° arc</td><td>0.047 mm</td><td>0.095 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Rim sherd, 120° arc</td><td>0.022 mm</td><td>0.082 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Rim sherd, 90° arc</td><td>0.055 mm</td><td>0.105 mm</td><td><span class="tag ok">GO</span></td></tr>
+<tr><td>Rim sherd, 60° arc</td><td>1.4 mm</td><td>4.0 mm</td><td><span class="tag warn">REVIEW</span></td></tr>
+</table></div>
+<p>Reproduce with <code>python cpu/tools/synthetic_validation.py out/</code>. It takes about 30 seconds and needs no downloads.</p>
+
+<h2>On a real museum scan</h2>
+<figure>
+<img src="validation/lekythos_profile_overlay.png" alt="Extracted profile of an Attic lekythos with handle rejection">
+<figcaption>Attic white-ground lekythos (Zenodo 5102757), fully automatic. The black median-radius line stays on the wall; the red dotted 98th-percentile line bulges where the handle is, which is why the median is used.</figcaption>
+</figure>
+<figure>
+<img src="validation/accuracy_vs_arc.png" alt="Axis error and radial error against rim arc length">
+<figcaption>Wedges of increasing rim arc cropped from that vessel. The <code>rim_arc</code> method reaches sub-degree axis error from about 90° of clean rim; PCA never does.</figcaption>
+</figure>
+
+<h2>Wall thickness</h2>
+<figure>
+<img src="validation/thickness_synthetic.png" alt="Two-walled half-section and flat 6 mm thickness curve">
+<figcaption>A synthetic shell with a known 6&nbsp;mm wall. The extractor recovers 6.00&nbsp;mm in every band.</figcaption>
+</figure>
+
+<h2>A drawing from a cropped fragment</h2>
+<figure>
+<img src="validation/example_drawing.png" alt="Profile drawing of a cropped rim fragment" style="max-height:480px">
+<figcaption>Output for a rim fragment cropped from the lekythos. The ragged edges at the rim and break are real mesh noise, not smoothed away.</figcaption>
+</figure>
+
+<div class="pager"><a class="btn" href="field-guide.html">← Field guide</a><span></span></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

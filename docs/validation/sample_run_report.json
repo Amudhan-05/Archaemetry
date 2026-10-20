@@ -1,0 +1,26 @@
+{
+  "input": "synthetic_vessel_with_handle_turntable_noise.ply",
+  "verdict": "GO",
+  "flags": [],
+  "cleanup": {
+    "components_before": 43,
+    "kept_fraction": 0.9952,
+    "compactness_ratio": 0.387
+  },
+  "profile": {
+    "axis_method": "pca",
+    "axis_dir": [
+      -0.0,
+      -1.0,
+      0.0
+    ],
+    "height_mm": 113.62,
+    "max_radius_mm": 21.996,
+    "mean_angular_coverage": 1.0,
+    "wall_thickness_mm": null
+  },
+  "outputs": {
+    "clean": "clean.obj",
+    "drawing": "drawing.svg"
+  }
+}

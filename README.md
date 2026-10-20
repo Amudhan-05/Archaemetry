@@ -21,7 +21,8 @@ archaemetry/
       marker-measurements.csv   calliper-measured distances between marker pairs
   templates/
     sherd_template/          copy this per sherd (see below)
-  scripts/                   processing/automation helpers (empty for now)
+  cpu/                       Stages 2-4: cleanup, profile extraction, publish (built, CPU-only)
+  gpu/                       Stage 1: images -> scaled mesh (SfM/MVS; planned, needs a CUDA GPU)
 ```
 
 Each sherd gets its own working copy of `templates/sherd_template/`, renamed to its sherd ID:

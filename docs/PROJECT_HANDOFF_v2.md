@@ -186,7 +186,7 @@ what it can be substituted with.
   Geometry Nodes + Python — a credible headless substitute for Stage 3 we noted but did not
   pursue (our Open3D/numpy approach was lighter). Keep in mind as an alternative.
 - **Open3D 0.19, numpy 2.2.6, matplotlib 3.10.9, PyYAML 6.0.2** — the actual runtime deps
-  (pymeshlab optional, only for hole-fill). See `scripts/requirements.txt`.
+  (pymeshlab optional, only for hole-fill). See `cpu/requirements.txt`.
 
 ---
 
@@ -213,22 +213,22 @@ Scale anchor throughout: **ArUco markers + calliper distances** (logged in
 
 ## 6. What was actually built (the repo)
 
-All under `scripts/` on branch `automation-pipeline`. The whole lane is CPU-only, headless.
+All under `cpu/` (was `scripts/` when written) on branch `automation-pipeline`. The whole lane is CPU-only, headless.
 
 | Path | Stage | What it does |
 |---|---|---|
-| `scripts/run.py` | all | One-command orchestrator. Reads `sherd.yaml`, drives 2→3→4, aggregates confidence reports, prints **GO / REVIEW** verdict (flags fragments for the manual/GigaMesh route). |
-| `scripts/clean_mesh.py` | 2 | Keep-largest-component cleanup (drops turntable + noise deterministically), optional capped hole-fill, JSON confidence report. |
-| `scripts/extract_profile.py` | 3 | Axis fit (`--axis-method pca\|rim_arc`), cylindrical projection, **inner/outer wall split → thickness**, CVA half-section SVG + overlay + report. |
-| `scripts/publish_svg.py` | 4 | Adds scale bar, caption, CVA line weight (portable SVG editing, no GUI). |
-| `scripts/config/sherd.example.yaml` | — | The entire field-facing parameter surface (below). |
-| `scripts/requirements.txt` | — | Pinned deps (numpy, open3d, matplotlib, pyyaml; pymeshlab optional). |
-| `scripts/tools/diagnose_components.py` | — | Inspect connected-component structure of a raw mesh. |
-| `scripts/tools/render_mesh.py` | — | Quick mesh→PNG for visual checks. |
-| `scripts/tools/crop_wedge.py` | — | Crop a complete vessel to an angular wedge to simulate a sherd with ground truth. |
-| `scripts/tools/compare_profiles.py` | — | Fragment vs full-vessel profile error (early harness; superseded by the oracle). |
-| `scripts/tools/accuracy_oracle.py` | — | Ground-truth-registered accuracy vs rim-arc length (the trustworthy oracle). |
-| `scripts/tools/make_synthetic_shell.py` | — | Generate a hollow shell with KNOWN wall thickness for thickness validation. |
+| `cpu/run.py` | all | One-command orchestrator. Reads `sherd.yaml`, drives 2→3→4, aggregates confidence reports, prints **GO / REVIEW** verdict (flags fragments for the manual/GigaMesh route). |
+| `cpu/clean_mesh.py` | 2 | Keep-largest-component cleanup (drops turntable + noise deterministically), optional capped hole-fill, JSON confidence report. |
+| `cpu/extract_profile.py` | 3 | Axis fit (`--axis-method pca\|rim_arc`), cylindrical projection, **inner/outer wall split → thickness**, CVA half-section SVG + overlay + report. |
+| `cpu/publish_svg.py` | 4 | Adds scale bar, caption, CVA line weight (portable SVG editing, no GUI). |
+| `cpu/config/sherd.example.yaml` | — | The entire field-facing parameter surface (below). |
+| `cpu/requirements.txt` | — | Pinned deps (numpy, open3d, matplotlib, pyyaml; pymeshlab optional). |
+| `cpu/tools/diagnose_components.py` | — | Inspect connected-component structure of a raw mesh. |
+| `cpu/tools/render_mesh.py` | — | Quick mesh→PNG for visual checks. |
+| `cpu/tools/crop_wedge.py` | — | Crop a complete vessel to an angular wedge to simulate a sherd with ground truth. |
+| `cpu/tools/compare_profiles.py` | — | Fragment vs full-vessel profile error (early harness; superseded by the oracle). |
+| `cpu/tools/accuracy_oracle.py` | — | Ground-truth-registered accuracy vs rim-arc length (the trustworthy oracle). |
+| `cpu/tools/make_synthetic_shell.py` | — | Generate a hollow shell with KNOWN wall thickness for thickness validation. |
 
 **The parameter surface** (`sherd.example.yaml`) — a field user typically edits only
 `images_dir`, the `scale` block, and `ware`:
@@ -351,7 +351,7 @@ GigaMesh-vs-script choice**, and none is the cloud-vs-local choice.
 ## 12. How to run (environment)
 
 ```bash
-# from the repo's scripts/ dir
+# from the repo's cpu/ dir
 python -m venv .venv && .venv/Scripts/activate      # Windows; bin/activate on *nix
 pip install -r requirements.txt
 
@@ -395,8 +395,8 @@ open/track the PR at
 
 - Original setup/capture handoff: [`docs/handoff.md`](handoff.md)
 - Empirical results + figures: [`docs/AUTOMATION_VALIDATION.md`](AUTOMATION_VALIDATION.md)
-- Automation architecture + usage: [`scripts/README.md`](../scripts/README.md)
-- Parameter surface: [`scripts/config/sherd.example.yaml`](../scripts/config/sherd.example.yaml)
+- Automation architecture + usage: [`cpu/README.md`](../cpu/README.md)
+- Parameter surface: [`cpu/config/sherd.example.yaml`](../cpu/config/sherd.example.yaml)
 - Reference papers (on the user's machine): Stamatopoulos & Anagnostopoulos (the chain's
   source); Hubert Mara / GigaMesh papers (rollouts, MSII, profiles).
 - Sample vessel: Zenodo 5102757 (CC-BY-SA-4.0).

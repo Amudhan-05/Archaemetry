@@ -1,6 +1,6 @@
 # Automation validation — profile extraction
 
-Empirical validation of the scripted profile pipeline ([`../scripts/`](../scripts/)),
+Empirical validation of the scripted profile pipeline ([`../cpu/`](../cpu/)),
 establishing where automation matches GigaMesh-grade output and where it does not yet.
 All results are reproducible from open data; no proprietary tools involved.
 

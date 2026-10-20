@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import open3d as o3d
-# extract_profile.py lives in the parent scripts/ directory
+# extract_profile.py lives in the parent cpu/ directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from extract_profile import fit_axis, fit_axis_rim_arc, profile_from_axis
 

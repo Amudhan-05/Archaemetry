@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proposal · archaemetry</title>
+<meta name="description" content="What archaemetry is doing, why it matters, what is proven and what is still open.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html" aria-current="page">Proposal</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="sample-output.html">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>Proposal</h1>
+<p class="lead">Make measured, publication-standard pottery drawings cheap and repeatable enough to do in the field, by automating everything that can be automated and being honest about what can't.</p></header>
+
+<h2>The problem</h2>
+<p>Pottery is the most abundant find on most archaeological sites, and a drawn profile (a cross-section showing the wall and its thickness) is the standard record of each vessel. Drawing one by hand is slow and varies between people. Specialist 3D tools such as GigaMesh produce excellent results but need desktop software, manual clicks per sherd, and a trained operator. That limits how many sherds are ever recorded to a measurable standard.</p>
+
+<h2>What the project does</h2>
+<ol class="steps">
+<li><b>Capture cheaply.</b> A consumer camera, a cardboard light tent, a turntable and printed scale markers. Hardware cost is about ₹3,000–4,300.</li>
+<li><b>Reconstruct.</b> Photogrammetry (SfM/MVS) turns the photos into a 3D mesh. Calliper-measured distances between markers set the metric scale.</li>
+<li><b>Automate the drawing.</b> Scripts clean the mesh, find the vessel's symmetry axis, cut the profile, measure wall thickness and publish a scaled SVG with the conventional line weight and scale bar.</li>
+<li><b>Gate the result.</b> Every run ends in <b>GO</b> or <b>REVIEW</b>. Fragments the method can't pin down are sent to a person instead of being drawn badly.</li>
+</ol>
+
+<h2>Design principle: automate around the specialist tool</h2>
+<p>Most of the pipeline is routine and scriptable. One part is genuinely specialist: decorated-ware rollouts and faint-relief enhancement in GigaMesh. Rather than imitate that, the project keeps it as an optional manual station and automates everything around it. Plain, rotationally symmetric ware goes through the automatic lane end to end.</p>
+
+<h2>What is already shown</h2>
+<div class="tablewrap"><table>
+<tr><th>Claim</th><th>Evidence</th><th>Caveat</th></tr>
+<tr><td>Background and noise removal is automatic</td><td>A raw Meshroom mesh with 710 components reduces to 1 with no manual clicks</td><td>One sample sherd</td></tr>
+<tr><td>Profile drawing matches the true shape</td><td>0.018&nbsp;mm RMS, 0.07&nbsp;mm max, read back from the published SVG, on a test vessel with known geometry</td><td>Ideal geometry plus small noise, not photogrammetry</td></tr>
+<tr><td>Fragments with enough rim work automatically</td><td>≥ 90° of clean rim arc gives a sub-degree axis; about 1–2&nbsp;mm on a real vessel crop</td><td>Cropped from a complete vessel, so edges are cleaner than real breaks</td></tr>
+<tr><td>Too-little-rim fragments are caught</td><td>At 60° the method refuses and flags REVIEW</td><td>Flag works; accuracy there is the open problem</td></tr>
+<tr><td>Wall thickness is measurable</td><td>6.00&nbsp;mm recovered exactly on a synthetic 6&nbsp;mm shell</td><td>Needs a mesh with both wall surfaces</td></tr>
+</table></div>
+
+<h2>What is not yet shown</h2>
+<div class="callout warn"><b>Real sherds.</b> No accuracy figure on this site is from a photographed, broken sherd with a calliper-checked answer. That is the next and most important test. Until it is done, the numbers show the processing is correct, not that the whole chain reaches that accuracy.</div>
+<ul>
+<li>Camera distortion on the Nikon AW100 is the largest known risk to metric accuracy.</li>
+<li>The Stage 1 photo-to-mesh step is manual today.</li>
+<li>Body sherds with no rim have no reliable automatic axis yet.</li>
+</ul>
+
+<h2>How accuracy will be proven</h2>
+<p>Take at least three independent photo sets of the same sherd, repositioning the sherd and markers between sets. Extract thickness at the same 5–10 points on every model and compare against digital-calliper readings (0.01&nbsp;mm). Report mean difference and standard deviation, which separates repeatability within a session from reproducibility across sessions.</p>
+
+<h2>Roadmap</h2>
+<ol>
+<li>Validate on real broken rim sherds against calliper measurements.</li>
+<li>Build the GPU lane (<code>gpu/</code>): COLMAP/OpenMVS runner, masking, automatic marker scaling.</li>
+<li>Improve small-arc and body-sherd axis estimation.</li>
+<li>Package as a notebook or container so it runs on any machine.</li>
+<li>Decide the production path (rented GPU, per-image licence, or a Metashape licence) once funded.</li>
+</ol>
+
+<div class="pager"><span></span><a class="btn" href="how-it-works.html">How it works →</a></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

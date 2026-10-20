@@ -101,7 +101,7 @@ def main():
                     ("components_before", "kept_fraction", "compactness_ratio")},
         "profile": {k: prof_rep.get(k) for k in
                     ("axis_method", "axis_dir", "height_mm", "max_radius_mm",
-                     "mean_angular_coverage")},
+                     "mean_angular_coverage", "wall_thickness_mm")},
         "outputs": {"clean": clean_obj, "drawing": drawing},
     }
     with open(os.path.join(args.outdir, "run_report.json"), "w") as f:

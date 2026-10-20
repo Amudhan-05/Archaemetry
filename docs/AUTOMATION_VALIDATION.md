@@ -163,9 +163,31 @@ measures.)
 which have cleaner edges than real broken sherds. The next test is a genuinely broken rim
 sherd (see below).
 
+## Result 6 — wall thickness (two-walled section)
+
+A publication profile is a *section*: it needs the interior wall as well as the exterior,
+and the gap between them is the wall thickness. `extract_profile.py` now splits each height
+band's radii into inner- and outer-wall surfaces (1-D Otsu on the radius distribution), so
+where a mesh contains both surfaces it draws a half-section (exterior contour on the right;
+exterior + interior walls on the left) and reports `wall_thickness_mm`.
+
+![thickness on synthetic shell](validation/thickness_synthetic.png)
+
+Validated on a synthetic hollow shell with a **known 6 mm** wall (`tools/make_synthetic_shell.py`):
+the extractor recovers **6.00 mm (6.00–6.00), 100 % of bands two-walled** — exact.
+
+**Important data caveat:** thickness only exists if the mesh captured *both* surfaces. The
+Zenodo museum meshes (and the lekythos wedges above) are **exterior-only closed surfaces**,
+so they correctly report *no* thickness and draw a single line — there is no interior wall
+in that data. A **real broken sherd**, photographed from all angles (including tilted to see
+inside), records both the exterior and interior wall surfaces, so thickness appears as it
+does on the synthetic shell. The single line in the earlier lekythos figures was correct for
+that data, not a bug.
+
 ## Bottom line
 
 The automatable lane is **field-ready for fragments carrying ≳90° of clean rim arc, and
-for complete/large vessels** — sub-degree axis, ~mm profile. For small-arc rim sherds and
-body sherds, keep the **bookend** deployment (GigaMesh for the profile) until `rim_arc`
-gets its robustness pass and is re-measured on real sherds (not just cropped vessels).
+for complete/large vessels** — sub-degree axis, ~mm profile, and metric wall thickness where
+both surfaces are captured. For small-arc rim sherds and body sherds, keep the **bookend**
+deployment (GigaMesh for the profile) until `rim_arc` is re-measured on real broken sherds
+(not just cropped vessels).

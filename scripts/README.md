@@ -53,7 +53,7 @@ station.
 |---|---|---|
 | `run.py` | all | **One-command orchestrator.** Reads `sherd.yaml`, drives Stages 2→3→4, aggregates the confidence reports, and prints a **GO / REVIEW** verdict (flags fragments that should go to the manual/GigaMesh route). |
 | `clean_mesh.py` | 2 | Keep the largest connected component (drops turntable + noise islands, deterministically), optional capped hole-fill. Replaces the manual MeshLab crop. Emits `*_report.json`. |
-| `extract_profile.py` | 3 | Auto-fit the symmetry axis (`pca`, or `rim_arc` for rim sherds with span+planarity gates and graceful fallback), project to cylindrical coords, emit a metric SVG profile + validation overlay + confidence report. Replaces GigaMesh's profile step for plain ware. |
+| `extract_profile.py` | 3 | Auto-fit the symmetry axis (`pca`, or `rim_arc` for rim sherds with span+planarity gates and graceful fallback), project to cylindrical coords, split each band into inner/outer walls (metric **wall thickness**), and emit a CVA half-section SVG + validation overlay + confidence report. Replaces GigaMesh's profile step for plain ware. |
 | `publish_svg.py` | 4 | Add a metric scale bar, caption, and CVA line weight to the profile SVG (portable SVG editing, no GUI dependency). |
 | `tools/diagnose_components.py` | — | Inspect the connected-component structure of a raw SfM mesh (sherd vs turntable vs noise). |
 | `tools/render_mesh.py` | — | Quick PNG render of a mesh for visual checks. |

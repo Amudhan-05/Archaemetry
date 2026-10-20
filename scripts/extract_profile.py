@@ -223,7 +223,39 @@ def fit_axis_rim_arc(V, T, max_resid=0.05, min_span_deg=70.0, band_frac=0.15):
     return p0, d, info
 
 
-def profile_from_axis(V, p0, d, n_bands=300):
+def split_walls(r, min_sep):
+    """Split a band's radii into inner- and outer-wall surfaces via a 1-D Otsu
+    threshold. Returns (r_inner, r_outer, is_two_walled). A single-surface band
+    (e.g. an exterior-only scan) is unimodal -> inner==outer, thickness 0."""
+    if len(r) < 12:
+        m = float(np.median(r)); return m, m, False
+    lo, hi = np.percentile(r, [2, 98])
+    if hi - lo < min_sep:                     # too tight to be two walls
+        m = float(np.median(r)); return m, m, False
+    bins = np.linspace(lo, hi, 33)
+    hist, _ = np.histogram(r, bins=bins)
+    centers = 0.5 * (bins[:-1] + bins[1:])
+    total = hist.sum()
+    w0 = np.cumsum(hist)
+    w1 = total - w0
+    mu = np.cumsum(hist * centers)
+    muT = mu[-1]
+    with np.errstate(divide="ignore", invalid="ignore"):
+        between = (muT * w0 - mu) ** 2 / (w0 * w1)
+    between = np.nan_to_num(between)
+    k = int(np.argmax(between[:-1]))
+    t = centers[k]
+    inner = r[r <= t]
+    outer = r[r > t]
+    if len(inner) < 3 or len(outer) < 3:
+        m = float(np.median(r)); return m, m, False
+    ri, ro = float(np.median(inner)), float(np.median(outer))
+    if ro - ri < min_sep:
+        m = float(np.median(r)); return m, m, False
+    return ri, ro, True
+
+
+def profile_from_axis(V, p0, d, n_bands=300, walls=False, min_sep=0.4):
     e1, e2, d = basis_from_dir(d)
     Pw = V - p0
     h = Pw @ d
@@ -233,6 +265,7 @@ def profile_from_axis(V, p0, d, n_bands=300):
     lo, hi = h.min(), h.max()
     edges = np.linspace(lo, hi, n_bands + 1)
     hs, r_med, r_max, cover = [], [], [], []
+    r_in, r_out, thick = [], [], []
     for i in range(n_bands):
         m = (h >= edges[i]) & (h < edges[i + 1])
         if m.sum() < 10:
@@ -244,47 +277,66 @@ def profile_from_axis(V, p0, d, n_bands=300):
         r_med.append(np.median(r[m]))       # robust wall radius (ignores handle)
         r_max.append(np.percentile(r[m], 98))
         cover.append(filled / 24.0)
+        if walls:
+            ri, ro, two = split_walls(r[m], min_sep)
+            r_in.append(ri); r_out.append(ro)
+            thick.append(ro - ri if two else np.nan)
+    if walls:
+        return (np.array(hs), np.array(r_med), np.array(r_max), np.array(cover),
+                np.array(r_in), np.array(r_out), np.array(thick))
     return (np.array(hs), np.array(r_med), np.array(r_max), np.array(cover))
 
 
 # ---------- output ----------
-def write_svg(hs, rs, path, mm, stroke=0.3):
+def write_svg(hs, r_outer, r_inner, path, mm, stroke=0.3):
+    """CVA-style half-section: right side = exterior contour; left side = the cut
+    section (exterior + interior wall lines, gap = wall thickness)."""
     h0 = hs.min()
     H = (hs - h0) * mm
-    R = rs * mm
-    Rmax = R.max()
-    # archaeological convention: profile line on the right, mirror on the left
+    Ro = r_outer * mm
+    Ri = r_inner * mm
+    Rmax = Ro.max()
     total_h = H.max()
     pad = 5
     W = 2 * Rmax + 2 * pad
-    def pt(r, h, sign):
-        x = Rmax + sign * r + pad
-        y = total_h - h + pad
-        return f"{x:.2f},{y:.2f}"
-    right = " ".join(pt(r, h, +1) for r, h in zip(R, H))
-    left = " ".join(pt(r, h, -1) for r, h in zip(R[::-1], H[::-1]))
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W:.1f}mm" height="{total_h+2*pad:.1f}mm" viewBox="0 0 {W:.1f} {total_h+2*pad:.1f}">
-<polyline fill="none" stroke="black" stroke-width="{stroke}" points="{right}"/>
-<polyline fill="none" stroke="black" stroke-width="{stroke}" points="{left}"/>
-<line x1="{Rmax+pad:.1f}" y1="{pad}" x2="{Rmax+pad:.1f}" y2="{total_h+pad:.1f}" stroke="black" stroke-width="0.1" stroke-dasharray="2,2"/>
-</svg>'''
+
+    def poly(rs, hh, sign):
+        pts = " ".join(f"{Rmax + sign * r + pad:.2f},{total_h - h + pad:.2f}"
+                       for r, h in zip(rs, hh))
+        return f'<polyline fill="none" stroke="black" stroke-width="{stroke}" points="{pts}"/>'
+
+    parts = [
+        poly(Ro, H, +1),                 # right: exterior contour
+        poly(Ro, H, -1),                 # left: exterior wall of the section
+        poly(Ri, H, -1),                 # left: interior wall of the section
+    ]
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:.1f}mm" '
+           f'height="{total_h + 2 * pad:.1f}mm" '
+           f'viewBox="0 0 {W:.1f} {total_h + 2 * pad:.1f}">\n'
+           + "\n".join(parts) +
+           f'\n<line x1="{Rmax + pad:.1f}" y1="{pad}" x2="{Rmax + pad:.1f}" '
+           f'y2="{total_h + pad:.1f}" stroke="black" stroke-width="0.1" '
+           f'stroke-dasharray="2,2"/>\n</svg>')
     with open(path, "w") as f:
         f.write(svg)
 
 
-def write_overlay(hs, r_med, r_max, cover, path, mm):
+def write_overlay(hs, r_outer, r_inner, thick, cover, path, mm):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     H = (hs - hs.min()) * mm
     fig, ax = plt.subplots(1, 2, figsize=(9, 7), gridspec_kw={"width_ratios": [2, 1]})
-    ax[0].plot(r_med * mm, H, "-k", lw=1.2, label="exterior r_median")
-    ax[0].plot(-r_med * mm, H, "-k", lw=1.2)
-    ax[0].plot(r_max * mm, H, ":", color="tab:red", lw=0.8, label="r_98pct (handle/bulges)")
-    ax[0].set_aspect("equal"); ax[0].set_title("Extracted profile"); ax[0].legend(fontsize=7)
+    ax[0].plot(r_outer * mm, H, "-k", lw=1.2, label="exterior")
+    ax[0].plot(-r_outer * mm, H, "-k", lw=1.2)
+    ax[0].plot(-r_inner * mm, H, "-", color="tab:red", lw=1.0, label="interior (section)")
+    ax[0].set_aspect("equal"); ax[0].set_title("Extracted profile (half-section)")
+    ax[0].legend(fontsize=7)
     ax[0].set_xlabel("radius (mm)"); ax[0].set_ylabel("height (mm)")
-    ax[1].plot(cover, H, "-", color="tab:blue"); ax[1].set_xlim(0, 1)
-    ax[1].set_title("angular coverage\n(1.0 = full ring)"); ax[1].set_xlabel("fraction")
+    ax[1].plot(thick * mm, H, "-", color="tab:green")
+    ax[1].set_title("wall thickness (mm)"); ax[1].set_xlabel("mm")
+    tmax = np.nanmax(thick * mm) if np.isfinite(thick).any() else 1
+    ax[1].set_xlim(0, max(tmax * 1.3, 1))
     fig.tight_layout(); fig.savefig(path, dpi=110); plt.close(fig)
 
 
@@ -297,6 +349,8 @@ def main():
                     help="pca: near-complete vessels; rim_arc: rim sherds (axis from border arcs)")
     ap.add_argument("--assume-mm-per-unit", type=float, default=1.0,
                     help="scale factor unit->mm (1.0 if mesh already in mm)")
+    ap.add_argument("--min-wall-sep-mm", type=float, default=0.4,
+                    help="min inner/outer radius gap (in mesh units) to call it a two-walled sherd")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -315,17 +369,26 @@ def main():
         p0, d, resid = fit_axis(V)
     print(f"axis dir={d.round(3)}  residual={resid:.4g} units")
 
-    hs, r_med, r_max, cover = profile_from_axis(V, p0, d, args.bands)
+    hs, r_med, r_max, cover, r_in, r_out, thick = profile_from_axis(
+        V, p0, d, args.bands, walls=True, min_sep=args.min_wall_sep_mm)
     mm = args.assume_mm_per_unit
     height_mm = (hs.max() - hs.min()) * mm
     maxr_mm = r_med.max() * mm
+    th_valid = thick[np.isfinite(thick)] * mm
+    two_walled_frac = float(np.isfinite(thick).mean())
+    if len(th_valid):
+        print(f"wall thickness: mean={th_valid.mean():.2f}mm "
+              f"({th_valid.min():.2f}-{th_valid.max():.2f}), "
+              f"two-walled bands={two_walled_frac:.0%}")
+    else:
+        print("wall thickness: none detected (single-surface / exterior-only mesh)")
     print(f"profile: {len(hs)} bands, height={height_mm:.2f}mm, max radius={maxr_mm:.2f}mm")
     print(f"mean angular coverage={cover.mean():.2f}  (1.0=full vessel, <0.5=partial sherd)")
 
     svg = os.path.join(args.outdir, "profile.svg")
     png = os.path.join(args.outdir, "profile_overlay.png")
-    write_svg(hs, r_med, svg, mm)
-    write_overlay(hs, r_med, r_max, cover, png, mm)
+    write_svg(hs, r_out, r_in, svg, mm)
+    write_overlay(hs, r_out, r_in, thick, cover, png, mm)
 
     report = {
         "input": args.inp,
@@ -340,6 +403,12 @@ def main():
         "max_radius_mm": round(maxr_mm, 3),
         "mean_angular_coverage": round(float(cover.mean()), 3),
         "min_angular_coverage": round(float(cover.min()), 3),
+        "wall_thickness_mm": ({
+            "mean": round(float(th_valid.mean()), 3),
+            "min": round(float(th_valid.min()), 3),
+            "max": round(float(th_valid.max()), 3),
+            "two_walled_band_fraction": round(two_walled_frac, 3),
+        } if len(th_valid) else None),
     }
     with open(os.path.join(args.outdir, "profile_report.json"), "w") as f:
         json.dump(report, f, indent=2)

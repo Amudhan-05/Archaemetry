@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Result · archaemetry</title>
+<meta name="description" content="The reproduced profile against the original 2D line.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="paths.html">CPU & GPU paths</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="hardware.html">Hardware & inputs</a><a href="result.html" aria-current="page">Result</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>Result</h1>
+<p class="lead">The pipeline's drawing laid over the original 2D profile it was asked to reproduce.</p></header>
+<figure>
+<img src="validation/final_reproduction.png" alt="Original 2D profile line against the reproduced line for a complete vessel, a rim sherd and a body sherd">
+<figcaption>The original 2D profile (wide sand line) against the line the pipeline reproduced (thin orange), for a complete vessel, a rim sherd and a rim-less body sherd. Test geometry with a known answer, not photographs.</figcaption>
+</figure>
+<div class="callout warn"><b>What this is.</b> The vessel is test geometry with a known profile, run through the real pipeline and read back from the published SVG. It shows the processing reproduces the line. It is <b>not</b> yet a result from a photographed sherd, so it says nothing about camera or reconstruction error. The body-sherd panel uses the experimental surface-fit axis.</div>
+
+<h2>The drawing it produces</h2>
+<figure>
+<img src="validation/sample_drawing.svg" alt="Half-section profile drawing with scale bar" style="max-height:560px">
+<figcaption>The published drawing for the complete vessel: both halves of the outline, dashed centre line, scale bar and caption.</figcaption>
+</figure>
+<p class="small">Real-sherd results will replace this page after the rig is built. See <a href="hardware.html">Hardware &amp; inputs</a>.</p>
+
+<div class="pager"><a class="btn" href="hardware.html">← Hardware & inputs</a><span></span></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -11,7 +11,7 @@
 <body>
 <div class="top"><div class="wrap">
 <a class="brand" href="index.html">archae<span>metry</span></a>
-<nav><a href="index.html" aria-current="page">Home</a><a href="proposal.html">Proposal</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="sample-output.html">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<nav><a href="index.html" aria-current="page">Home</a><a href="proposal.html">Proposal</a><a href="paths.html">CPU & GPU paths</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="hardware.html">Hardware & inputs</a><a href="result.html">Result</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
 <button id="theme" type="button">Theme</button>
 </div></div>
 <main class="wrap">
@@ -19,29 +19,26 @@
 <header class="hero">
 <span class="tag acc">Proof of concept</span>
 <h1 style="margin-top:12px">Photograph a sherd.<br>Get a measured drawing.</h1>
-<p class="lead">archaemetry is a low-cost, field-portable pipeline that turns photographs of archaeological pottery into a scaled 3D mesh and a publication-style profile drawing, with a built-in check that says when the result can be trusted.</p>
-<div class="btns"><a class="btn p" href="proposal.html">Read the proposal</a><a class="btn" href="sample-output.html">See sample output</a><a class="btn" href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></div>
+<p class="lead">archaemetry turns photographs of archaeological pottery into a scaled 3D mesh and a publication-style profile drawing, with a built-in check that says when the result can be trusted.</p>
+<div class="btns"><a class="btn p" href="proposal.html">Read the proposal</a><a class="btn" href="paths.html">CPU &amp; GPU paths</a><a class="btn" href="result.html">See the result</a></div>
 </header>
-
+<figure>
+<img src="validation/final_reproduction.png" alt="Original 2D profile line against the reproduced line for a complete vessel, a rim sherd and a body sherd">
+<figcaption>The original 2D profile (wide sand line) against the line the pipeline reproduced (thin orange), for a complete vessel, a rim sherd and a rim-less body sherd. Test geometry with a known answer, not photographs.</figcaption>
+</figure>
 <h2>Explore</h2>
 <div class="grid">
-<a class="card" href="proposal.html"><h3>Proposal</h3><p>What the project is doing, why, what is already proven, and what is still open.</p></a>
-<a class="card" href="how-it-works.html"><h3>How it works</h3><p>The four stages and the maths inside them, including how the symmetry axis is found.</p></a>
-<a class="card" href="field-guide.html"><h3>Field guide</h3><p>How to capture, run and read the result, and when to send a sherd for manual review.</p></a>
-<a class="card" href="sample-output.html"><h3>Sample output</h3><p>A real run, the drawing it produced, and how far it sits from the known truth.</p></a>
+<a class="card" href="proposal.html"><h3>Proposal</h3><p>What the project is doing, why, and what is still unproven.</p></a>
+<a class="card" href="paths.html"><h3>CPU &amp; GPU paths</h3><p>Every step, the options at each, and what has been tested.</p></a>
+<a class="card" href="how-it-works.html"><h3>How it works</h3><p>The methods inside the stages, including how the symmetry axis is found.</p></a>
+<a class="card" href="field-guide.html"><h3>Field guide</h3><p>Capture, run, read the verdict, and when to send a sherd for manual review.</p></a>
+<a class="card" href="hardware.html"><h3>Hardware &amp; inputs</h3><p>Placeholders for the rig and your measured values once it is built.</p></a>
+<a class="card" href="result.html"><h3>Result</h3><p>Reproduced profile against the original line.</p></a>
 </div>
-
-<h2>Where it stands</h2>
-<div class="tablewrap"><table>
-<tr><th>Part</th><th>Status</th></tr>
-<tr><td>Cleanup, profile, thickness and drawing (CPU, <code>cpu/</code>)</td><td><span class="tag ok">Built</span> runs end to end, validated against known geometry</td></tr>
-<tr><td>Photos to scaled mesh (GPU, <code>gpu/</code>)</td><td><span class="tag warn">Planned</span> done by hand today in RealityCapture or Meshroom</td></tr>
-<tr><td>Real photographed broken sherds</td><td><span class="tag warn">Not yet validated</span> all accuracy numbers so far are on known test geometry</td></tr>
-</table></div>
 
 
 </main>
-<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0</footer></div>
 <script src="assets/site.js"></script>
 </body>
 </html>

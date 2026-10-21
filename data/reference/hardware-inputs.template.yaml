@@ -1,0 +1,58 @@
+# Fill this in after the rig is built. Every TBD mirrors a placeholder on the website's
+# "Hardware & inputs" page (docs/hardware.html). Keep one copy per capture setup, and a
+# per-sherd block (see `sherds:`) for each sherd you process.
+
+camera:
+  model: TBD
+  lens: TBD
+  focal_length_mm: TBD
+  sensor_width_mm: TBD            # AW100 is 6.17; update if the camera changes
+  iso: TBD
+  aperture: TBD
+  white_balance: TBD              # locked manually, never Auto
+  shutter_trigger: TBD            # 2 s timer / IR remote
+
+lighting:
+  lamp_model: TBD                 # two identical units
+  colour_temperature_k: TBD
+  distance_to_panel_cm: TBD
+  elevation_deg: TBD
+  cross_polarised: TBD            # yes/no
+
+turntable:
+  diameter_cm: TBD
+  step_deg: TBD                   # 10 planned
+  surface: TBD
+
+tent:
+  interior_cm: {w: TBD, d: TBD, h: TBD}
+
+scale_markers:
+  dictionary: TBD                 # e.g. an ArUco dictionary name
+  count: TBD
+  printed_size_mm: TBD
+  pair_distances_mm:              # calliper-measured; source of all metric accuracy
+    - {pair: [TBD, TBD], mm: TBD}
+
+calibration:
+  grey_card_rgb: [TBD, TBD, TBD]  # reference values to match each session
+  intrinsics: {fx: TBD, fy: TBD, cx: TBD, cy: TBD, distortion: TBD}
+  reprojection_error_px: TBD
+
+compute:
+  local_gpu: "NVIDIA RTX 3050, 4 GB VRAM"   # known
+  cloud_option: TBD
+
+calliper:
+  model: TBD
+  resolution_mm: 0.01
+  calibrated_on: TBD
+
+sherds:
+  - id: TBD
+    ware: TBD                     # plain | decorated
+    height_mm: TBD
+    rim_diameter_mm: TBD
+    n_images: TBD
+    wall_thickness_points_mm:     # same 5-10 points on every model and by calliper
+      - {at: TBD, calliper_mm: TBD, pipeline_mm: TBD}

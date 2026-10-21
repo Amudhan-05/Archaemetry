@@ -31,7 +31,7 @@ Radial RMS in mm of the drawn profile against the truth.
 | Lekythos, body crop 150 deg (no rim) | 7.98 | 7.98 | **0.02** |
 | Straight jar, body crop 90 deg | 17.2 | 17.2 | **0.03** |
 | Cone bowl, rim crop 90 deg | 23.7 | 23.7 | 0.09 |
-| Full-lekythos wall, 3% out-of-round, rim 90 deg | 0.41 | 1.90 | 0.87 |
+| Lekythos made 3% out-of-round, rim crop 90 deg | 0.41 | 1.90 | 0.87 |
 
 Through the whole lane (`run.py` to published SVG): a 60 deg rim sherd goes from
 1.39 mm RMS (`rim_arc`, REVIEW) to 0.027 mm; 60-120 deg body sherds give 0.01-0.03 mm; a

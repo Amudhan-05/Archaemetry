@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPU & GPU paths · archaemetry</title>
+<meta name="description" content="The steps of the pipeline on a GPU path and a CPU path, the options at each step and what has been tested.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="paths.html" aria-current="page">CPU & GPU paths</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="hardware.html">Hardware & inputs</a><a href="result.html">Result</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>CPU &amp; GPU paths</h1>
+<p class="lead">Both paths run the same four stages. They differ in where photogrammetry (Stage 1) runs. Stages 2 to 4, where the drawing is made, are CPU-only on both.</p></header>
+
+<div class="legend"><span class="tag ok">Tested</span> verified by us on known test data &nbsp; <span class="tag acc">Built, not validated</span> code exists &nbsp; <span class="tag warn">Prototype</span> experimental &nbsp; <span class="tag manual">Manual</span> done by hand in a GUI &nbsp; <span class="tag todo">Planned</span> not built yet &nbsp; <span class="tag todo">Not tested</span> not tried</div>
+
+<div class="cols">
+<div class="card path"><h3>GPU path</h3><p>Photogrammetry on a CUDA GPU: fast, the likely production route. Local card is an RTX 3050 (4&nbsp;GB), which is slow on 150 images, so rented GPUs are an option.</p></div>
+<div class="card path cpu"><h3>CPU path</h3><p>No GPU needed anywhere, so it runs on any laptop or server. Photogrammetry is much slower. Also covers starting from an existing mesh, such as a museum scan.</p></div>
+</div>
+
+<h2>Tools and methods at a glance</h2>
+<div class="tablewrap"><table>
+<tr><th>Role</th><th>Tools</th></tr>
+<tr><td>Photogrammetry</td><td>RealityCapture, Meshroom (AliceVision), COLMAP + OpenMVS, Metashape</td></tr>
+<tr><td>Mesh and geometry code</td><td>Python, NumPy, Open3D; PyMeshLab (optional hole fill); MeshLab by hand as the reference</td></tr>
+<tr><td>Profile and rollout</td><td>Our scripts for plain ware; GigaMesh by hand for decorated ware</td></tr>
+<tr><td>Drawing</td><td>Plain SVG editing in Python; Inkscape for a final manual pass</td></tr>
+<tr><td>Scale and calibration</td><td>Printed ArUco markers, digital calliper, 18% grey card</td></tr>
+<tr><td>Methods</td><td>Largest-component cleanup, PCA + circle-centre axis, rim-arc axis, surface-normal axis with consistency refinement, median-radius bands, Otsu wall split</td></tr>
+</table></div>
+
+<h2>Stage 1 · Photos to scaled mesh</h2>
+<h3>GPU path</h3>
+<div class="tablewrap"><table><tr><th>Step</th><th>Our choice</th><th>Other options</th><th>Status</th></tr>
+<tr><td><b>Camera</b></td><td>Nikon Coolpix AW100 (proof of concept)</td><td>Mirrorless + 50&nbsp;mm macro (e.g. Sony A6000 series)</td><td><span class="tag todo">Not tested</span> real sherds</td></tr>
+<tr><td><b>Masking</b></td><td>RealityCapture's internal masking</td><td>Automatic per-image segmentation (rembg or SAM)</td><td><span class="tag manual">Manual</span> / <span class="tag todo">Planned</span></td></tr>
+<tr><td><b>Alignment (SfM)</b></td><td>RealityCapture</td><td>Meshroom, COLMAP (accepts camera pose priors from a rig), Metashape</td><td><span class="tag manual">Manual</span> · Meshroom run once on a sample sherd</td></tr>
+<tr><td><b>Dense surface + mesh</b></td><td>RealityCapture</td><td>Meshroom DepthMap + Meshing, OpenMVS, Metashape</td><td><span class="tag manual">Manual</span></td></tr>
+<tr><td><b>Scale</b></td><td>RealityCapture scale-bar tool with calliper distances</td><td>Scripted ArUco detection that applies the marker distances</td><td><span class="tag manual">Manual</span> / <span class="tag todo">Planned</span></td></tr>
+<tr><td><b>Where it runs</b></td><td>Local RTX 3050, 4&nbsp;GB</td><td>Google Colab, rented GPU (e.g. Vast.ai)</td><td><span class="tag todo">Not tested</span> for cloud</td></tr>
+</table></div>
+<p class="small">RealityCapture is Windows-only and cannot move to a notebook. The open options (COLMAP + OpenMVS, Meshroom) are the ones that can be packaged.</p>
+
+<h3>CPU path</h3>
+<div class="tablewrap"><table><tr><th>Step</th><th>Our choice</th><th>Other options</th><th>Status</th></tr>
+<tr><td><b>Capture and masking</b></td><td>Same as the GPU path</td><td></td><td><span class="tag todo">Not tested</span></td></tr>
+<tr><td><b>Alignment (SfM)</b></td><td>COLMAP sparse reconstruction on CPU</td><td>Meshroom feature stages</td><td><span class="tag todo">Not tested</span> expected to work, slow</td></tr>
+<tr><td><b>Dense surface + mesh</b></td><td>OpenMVS on CPU</td><td>Start from an existing mesh instead (museum scan, other scanner)</td><td><span class="tag todo">Not tested</span></td></tr>
+<tr><td><b>Scale</b></td><td>Scripted ArUco scaling</td><td>Scale bar set by hand</td><td><span class="tag todo">Planned</span></td></tr>
+<tr><td><b>Where it runs</b></td><td>Any laptop or server</td><td>Packaged container or notebook</td><td><span class="tag todo">Planned</span></td></tr>
+</table></div>
+<div class="callout warn"><b>Stage 1 CPU-only has not been tried.</b> It is listed because the tools support it in principle; time and quality on a CPU are unknown until it is run.</div>
+
+<h2>Stages 2 to 4 · Mesh to drawing (CPU, same on both paths)</h2>
+<div class="tablewrap"><table><tr><th>Step</th><th>Our choice</th><th>Other options</th><th>Status</th></tr>
+<tr><td><b>2 · Cleanup</b></td><td>Keep the largest component by face count</td><td>Drop components below a face count; MeshLab by hand</td><td><span class="tag ok">Tested</span> (largest component); <span class="tag acc">Built, not validated</span> (min-faces)</td></tr>
+<tr><td><b>2 · Hole fill</b></td><td>None (never fabricate geometry)</td><td>Capped fill with PyMeshLab</td><td><span class="tag acc">Built, not validated</span></td></tr>
+<tr><td><b>3 · Axis, complete vessels</b></td><td>PCA seed + circle-centre refinement</td><td>Manual axis hint</td><td><span class="tag ok">Tested</span></td></tr>
+<tr><td><b>3 · Axis, rim sherds</b></td><td>Rim-arc: plane and circle fitted to the rim</td><td>Manual axis and diameter (GigaMesh)</td><td><span class="tag ok">Tested</span> for ≥ 90° of rim</td></tr>
+<tr><td><b>3 · Axis, small or rim-less sherds</b></td><td>Surface-normal fit + profile-consistency refinement, multi-start</td><td>Inner-surface method; manual axis (GigaMesh)</td><td><span class="tag warn">Prototype</span> synthetic data only</td></tr>
+<tr><td><b>3 · Profile</b></td><td>Median radius per height band (ignores handles)</td><td>Maximum or percentile radius</td><td><span class="tag ok">Tested</span></td></tr>
+<tr><td><b>3 · Wall thickness</b></td><td>Otsu split into inner and outer wall</td><td>Manual calliper points</td><td><span class="tag ok">Tested</span> on a synthetic shell</td></tr>
+<tr><td><b>3 · Decorated ware rollout</b></td><td>GigaMesh, by hand</td><td>None planned</td><td><span class="tag manual">Manual</span> · <span class="tag todo">Not tested</span></td></tr>
+<tr><td><b>4 · Publish</b></td><td>Scale bar, caption, 0.3&nbsp;mm line in SVG</td><td>Inkscape by hand</td><td><span class="tag ok">Tested</span></td></tr>
+<tr><td><b>4 · Section hatching</b></td><td>—</td><td>Inkscape or SVG pattern</td><td><span class="tag todo">Planned</span></td></tr>
+<tr><td><b>Verdict</b></td><td>GO or REVIEW from axis evidence and coverage</td><td>Always manual review</td><td><span class="tag ok">Tested</span> on test data</td></tr>
+</table></div>
+
+<h2>Still to be tested</h2>
+<ul>
+<li>Any step on <b>real photographed sherds</b>, including the AW100's distortion.</li>
+<li>Surface-normal axis on real meshes, and its REVIEW threshold.</li>
+<li>Stage 1 on the open tools (COLMAP, OpenMVS) and on rented GPUs.</li>
+<li>Stage 1 with no GPU.</li>
+<li>Packaging, hatching, and the body-sherd inner-surface method.</li>
+</ul>
+
+<div class="pager"><a class="btn" href="proposal.html">← Proposal</a><a class="btn" href="how-it-works.html">How it works →</a></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

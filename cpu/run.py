@@ -19,6 +19,9 @@ import os
 import subprocess
 import sys
 
+# normals_refine: max disagreement (mm radial) between near-optimal axes before REVIEW.
+# Set from synthetic tests only (cpu/tools/axis_methods_eval.py); recheck on real sherds.
+AMBIGUITY_MM_MAX = 0.3
 HERE = os.path.dirname(os.path.abspath(__file__))
 PY = sys.executable
 
@@ -89,7 +92,13 @@ def main():
     flags = []
     if profile.get("axis_method") == "rim_arc" and fell_back:
         flags.append("rim_arc could not fix axis from a clean rim arc")
-    if coverage < 0.25:
+    amb = prof_rep.get("axis_info", {}).get("ambiguity_mm")
+    if amb is not None and amb > AMBIGUITY_MM_MAX:
+        flags.append(f"axis ambiguous: near-optimal axes disagree by {amb} mm "
+                     f"(sphere/cone-like or too little surface)")
+    # normals_refine has a direct axis-ambiguity gate, so the blunt coverage proxy is relaxed
+    cov_min = 0.10 if profile.get("axis_method") == "normals_refine" else 0.25
+    if coverage < cov_min:
         flags.append(f"very low angular coverage ({coverage})")
     verdict = "REVIEW (route to GigaMesh / manual axis)" if flags else "GO"
 

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hardware & inputs · archaemetry</title>
+<meta name="description" content="Placeholders for the capture rig and the physical inputs to be recorded after it is built.">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="top"><div class="wrap">
+<a class="brand" href="index.html">archae<span>metry</span></a>
+<nav><a href="index.html">Home</a><a href="proposal.html">Proposal</a><a href="paths.html">CPU & GPU paths</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="hardware.html" aria-current="page">Hardware & inputs</a><a href="result.html">Result</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<button id="theme" type="button">Theme</button>
+</div></div>
+<main class="wrap">
+
+<header class="hero"><h1>Hardware &amp; inputs</h1>
+<p class="lead">The rig is not built yet. Every <span class="ph">TBD</span> below is a value to fill in once it is, and they are the numbers that anchor accuracy.</p></header>
+<div class="callout"><b>Fill-in file.</b> The same fields exist as <code>data/reference/hardware-inputs.template.yaml</code> in the repository. Copy it, fill it in, and update this page from it.</div>
+
+<h2>Camera</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Model</td><td><span class="ph">TBD</span></td></tr><tr><td>Lens</td><td><span class="ph">TBD</span></td></tr><tr><td>Focal length (mm)</td><td><span class="ph">TBD</span></td></tr><tr><td>Sensor width (mm)</td><td>6.17 for the AW100; <span class="ph">TBD</span> if the camera changes</td></tr><tr><td>ISO / aperture</td><td><span class="ph">TBD</span> / <span class="ph">TBD</span></td></tr><tr><td>White balance (locked)</td><td><span class="ph">TBD</span></td></tr><tr><td>Shutter trigger</td><td><span class="ph">TBD</span> (timer or remote)</td></tr></table></div>
+
+<h2>Lighting and tent</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Lamp model (two identical)</td><td><span class="ph">TBD</span></td></tr><tr><td>Colour temperature (K)</td><td><span class="ph">TBD</span> (6500 planned)</td></tr><tr><td>Distance to panel (cm) / elevation (°)</td><td><span class="ph">TBD</span> / <span class="ph">TBD</span></td></tr><tr><td>Cross-polarised</td><td><span class="ph">TBD</span></td></tr><tr><td>Tent interior W × D × H (cm)</td><td><span class="ph">TBD</span></td></tr></table></div>
+
+<h2>Turntable</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Diameter (cm)</td><td><span class="ph">TBD</span></td></tr><tr><td>Step (°)</td><td><span class="ph">TBD</span> (10 planned)</td></tr><tr><td>Surface</td><td><span class="ph">TBD</span></td></tr></table></div>
+
+<h2>Scale markers and calliper</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Marker dictionary / count</td><td><span class="ph">TBD</span> / <span class="ph">TBD</span></td></tr><tr><td>Printed size (mm)</td><td><span class="ph">TBD</span></td></tr><tr><td>Calliper model / resolution</td><td><span class="ph">TBD</span> / 0.01 mm planned</td></tr><tr><td>Calliper last calibrated</td><td><span class="ph">TBD</span></td></tr></table></div>
+<h3>Marker-pair distances (source of all metric accuracy)</h3>
+<div class="tablewrap"><table>
+<tr><th>Pair</th><th>Calliper distance (mm)</th><th>Date measured</th></tr>
+<tr><td><span class="ph">TBD</span> – <span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td><span class="ph">TBD</span> – <span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td><span class="ph">TBD</span> – <span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+</table></div>
+
+<h2>Colour and camera calibration</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Grey card reference RGB</td><td><span class="ph">TBD</span> <span class="ph">TBD</span> <span class="ph">TBD</span></td></tr><tr><td>Camera intrinsics fx, fy, cx, cy</td><td><span class="ph">TBD</span></td></tr><tr><td>Lens distortion</td><td><span class="ph">TBD</span></td></tr><tr><td>Reprojection error (px)</td><td><span class="ph">TBD</span></td></tr></table></div>
+
+<h2>Compute</h2>
+<div class="tablewrap"><table><tr><th>Item</th><th>Value</th></tr><tr><td>Local GPU</td><td>NVIDIA RTX 3050, 4&nbsp;GB VRAM</td></tr><tr><td>Local CPU</td><td>AMD Ryzen 7 5000 series</td></tr><tr><td>Cloud option</td><td><span class="ph">TBD</span></td></tr></table></div>
+
+<h2>Per-sherd input record</h2>
+<div class="tablewrap"><table>
+<tr><th>Field</th><th>Sherd 1</th><th>Sherd 2</th></tr>
+<tr><td>Sherd ID</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Ware (plain / decorated)</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Height (mm, calliper)</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Rim diameter (mm)</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Images captured</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Axis method used</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>Pipeline verdict</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+</table></div>
+
+<h2>Wall-thickness check (the 3-session protocol)</h2>
+<p>Same 5–10 points on every model, compared with the calliper at the same points.</p>
+<div class="tablewrap"><table>
+<tr><th>Point</th><th>Calliper (mm)</th><th>Session 1</th><th>Session 2</th><th>Session 3</th></tr>
+<tr><td>1</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>2</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td>3</td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td><td><span class="ph">TBD</span></td></tr>
+<tr><td><b>Mean difference / SD</b></td><td colspan="4"><span class="ph">TBD</span> / <span class="ph">TBD</span></td></tr>
+</table></div>
+
+<div class="pager"><a class="btn" href="field-guide.html">← Field guide</a><a class="btn" href="result.html">Result →</a></div>
+</main>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0</footer></div>
+<script src="assets/site.js"></script>
+</body>
+</html>

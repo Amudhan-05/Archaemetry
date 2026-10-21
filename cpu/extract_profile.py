@@ -345,8 +345,10 @@ def main():
     ap.add_argument("inp")
     ap.add_argument("outdir")
     ap.add_argument("--bands", type=int, default=300)
-    ap.add_argument("--axis-method", choices=["pca", "rim_arc"], default="pca",
-                    help="pca: near-complete vessels; rim_arc: rim sherds (axis from border arcs)")
+    ap.add_argument("--axis-method", choices=["pca", "rim_arc", "normals_refine"], default="pca",
+                    help="pca: near-complete vessels; rim_arc: rim sherds (axis from border arcs); "
+                         "normals_refine (EXPERIMENTAL): surface-normal fit + profile-consistency "
+                         "refinement, multi-start; works without a rim, flags ambiguous axes")
     ap.add_argument("--assume-mm-per-unit", type=float, default=1.0,
                     help="scale factor unit->mm (1.0 if mesh already in mm)")
     ap.add_argument("--min-wall-sep-mm", type=float, default=0.4,
@@ -361,7 +363,12 @@ def main():
     print(f"loaded {len(V):,} verts, bbox={ext.round(3)}")
 
     axis_info = {"method": "pca"}
-    if args.axis_method == "rim_arc":
+    if args.axis_method == "normals_refine":
+        from axis_fit import fit_axis_multistart
+        p0, d, axis_info = fit_axis_multistart(V, T)
+        resid = axis_info.get("spread_mm", float("nan"))
+        print(f"axis[normals_refine]: {axis_info}")
+    elif args.axis_method == "rim_arc":
         p0, d, axis_info = fit_axis_rim_arc(V, T)
         resid = axis_info.get("resid", float("nan"))
         print(f"axis[rim_arc]: {axis_info}")

@@ -33,11 +33,14 @@ def true_r(h):
     return np.interp(h, KH, KR)
 
 
-def revolve(n_h=500, n_t=360, rng=None, noise=0.0):
-    h = np.linspace(0, 114, n_h)
+def revolve(n_h=500, n_t=360, rng=None, noise=0.0, knots=None, oval=0.0):
+    """Surface of revolution. knots=(kh, kr) overrides the default profile; oval adds
+    a cos(2*theta) out-of-roundness (fraction of radius) to mimic hand-made ware."""
+    kh, kr = (KH, KR) if knots is None else knots
+    h = np.linspace(kh[0], kh[-1], n_h)
     t = np.linspace(0, 2 * np.pi, n_t, endpoint=False)
     H, TH = np.meshgrid(h, t, indexing="ij")
-    R = true_r(H)
+    R = np.interp(H, kh, kr) * (1 + oval * np.cos(2 * TH))
     V = np.stack([R * np.cos(TH), H, R * np.sin(TH)], -1).reshape(-1, 3)
     idx = np.arange(n_h * n_t).reshape(n_h, n_t)
     a, b = idx[:-1], idx[1:]
@@ -173,6 +176,14 @@ def main():
     for deg in (360, 180, 120, 90, 60):
         Vs, Ts, _ = crop_wedge_faces(Vc, Tc, p_true, d_true, deg, 0.62, 1.0)
         results.append(run_case(f"D_rimsherd_{deg}deg_rim_arc", Vs, Ts, a.outdir, "rim_arc"))
+
+    # experimental normals_refine: small rim arcs, and body sherds with no rim at all
+    for deg in (90, 60, 45):
+        Vs, Ts, _ = crop_wedge_faces(Vc, Tc, p_true, d_true, deg, 0.62, 1.0)
+        results.append(run_case(f"E_rimsherd_{deg}deg_normals_refine", Vs, Ts, a.outdir, "normals_refine"))
+    for deg in (120, 90, 60):
+        Vs, Ts, _ = crop_wedge_faces(Vc, Tc, p_true, d_true, deg, 0.25, 0.55)
+        results.append(run_case(f"F_bodysherd_{deg}deg_normals_refine", Vs, Ts, a.outdir, "normals_refine"))
 
     for r in results:
         print(json.dumps(r))

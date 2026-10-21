@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Proposal · archaemetry</title>
-<meta name="description" content="What archaemetry is doing, why it matters, what is proven and what is still open.">
+<meta name="description" content="What archaemetry is doing, why it matters, and what is still unproven.">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})();</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <div class="top"><div class="wrap">
 <a class="brand" href="index.html">archae<span>metry</span></a>
-<nav><a href="index.html">Home</a><a href="proposal.html" aria-current="page">Proposal</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="sample-output.html">Sample output</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
+<nav><a href="index.html">Home</a><a href="proposal.html" aria-current="page">Proposal</a><a href="paths.html">CPU & GPU paths</a><a href="how-it-works.html">How it works</a><a href="field-guide.html">Field guide</a><a href="hardware.html">Hardware & inputs</a><a href="result.html">Result</a><a href="https://github.com/Amudhan-05/Archaemetry">GitHub</a></nav>
 <button id="theme" type="button">Theme</button>
 </div></div>
 <main class="wrap">
@@ -24,8 +24,8 @@
 
 <h2>What the project does</h2>
 <ol class="steps">
-<li><b>Capture cheaply.</b> A consumer camera, a cardboard light tent, a turntable and printed scale markers. Hardware cost is about ₹3,000–4,300.</li>
-<li><b>Reconstruct.</b> Photogrammetry (SfM/MVS) turns the photos into a 3D mesh. Calliper-measured distances between markers set the metric scale.</li>
+<li><b>Capture cheaply.</b> A consumer camera, a cardboard light tent, a turntable and printed scale markers, about ₹3,000–4,300 of hardware.</li>
+<li><b>Reconstruct.</b> Photogrammetry turns the photos into a 3D mesh. Calliper-measured distances between markers set the metric scale.</li>
 <li><b>Automate the drawing.</b> Scripts clean the mesh, find the vessel's symmetry axis, cut the profile, measure wall thickness and publish a scaled SVG with the conventional line weight and scale bar.</li>
 <li><b>Gate the result.</b> Every run ends in <b>GO</b> or <b>REVIEW</b>. Fragments the method can't pin down are sent to a person instead of being drawn badly.</li>
 </ol>
@@ -33,22 +33,15 @@
 <h2>Design principle: automate around the specialist tool</h2>
 <p>Most of the pipeline is routine and scriptable. One part is genuinely specialist: decorated-ware rollouts and faint-relief enhancement in GigaMesh. Rather than imitate that, the project keeps it as an optional manual station and automates everything around it. Plain, rotationally symmetric ware goes through the automatic lane end to end.</p>
 
-<h2>What is already shown</h2>
-<div class="tablewrap"><table>
-<tr><th>Claim</th><th>Evidence</th><th>Caveat</th></tr>
-<tr><td>Background and noise removal is automatic</td><td>A raw Meshroom mesh with 710 components reduces to 1 with no manual clicks</td><td>One sample sherd</td></tr>
-<tr><td>Profile drawing matches the true shape</td><td>0.018&nbsp;mm RMS, 0.07&nbsp;mm max, read back from the published SVG, on a test vessel with known geometry</td><td>Ideal geometry plus small noise, not photogrammetry</td></tr>
-<tr><td>Fragments with enough rim work automatically</td><td>≥ 90° of clean rim arc gives a sub-degree axis; about 1–2&nbsp;mm on a real vessel crop</td><td>Cropped from a complete vessel, so edges are cleaner than real breaks</td></tr>
-<tr><td>Too-little-rim fragments are caught</td><td>At 60° the method refuses and flags REVIEW</td><td>Flag works; accuracy there is the open problem</td></tr>
-<tr><td>Wall thickness is measurable</td><td>6.00&nbsp;mm recovered exactly on a synthetic 6&nbsp;mm shell</td><td>Needs a mesh with both wall surfaces</td></tr>
-</table></div>
+<h2>Two ways to run it</h2>
+<p>The same four stages can be run on a <b>GPU path</b> (fast photogrammetry on a CUDA card) or a <b>CPU path</b> (no GPU needed, slower). Stages 2 to 4, where the drawing is made, are CPU-only on both. See <a href="paths.html">CPU &amp; GPU paths</a>.</p>
 
 <h2>What is not yet shown</h2>
-<div class="callout warn"><b>Real sherds.</b> No accuracy figure on this site is from a photographed, broken sherd with a calliper-checked answer. That is the next and most important test. Until it is done, the numbers show the processing is correct, not that the whole chain reaches that accuracy.</div>
+<div class="callout warn"><b>Real sherds.</b> Everything so far is verified against test geometry with a known answer. No figure here comes from a photographed, broken sherd checked against a calliper. That is the next and most important test, and it needs the rig on the <a href="hardware.html">Hardware &amp; inputs</a> page.</div>
 <ul>
 <li>Camera distortion on the Nikon AW100 is the largest known risk to metric accuracy.</li>
-<li>The Stage 1 photo-to-mesh step is manual today.</li>
-<li>Body sherds with no rim have no reliable automatic axis yet.</li>
+<li>Out-of-round or hand-made vessels set an error floor that no fragment-only method can detect.</li>
+<li>Photogrammetry (Stage 1) is manual today.</li>
 </ul>
 
 <h2>How accuracy will be proven</h2>
@@ -56,16 +49,16 @@
 
 <h2>Roadmap</h2>
 <ol>
+<li>Build the rig and record its values on the Hardware &amp; inputs page.</li>
 <li>Validate on real broken rim sherds against calliper measurements.</li>
-<li>Build the GPU lane (<code>gpu/</code>): COLMAP/OpenMVS runner, masking, automatic marker scaling.</li>
-<li>Improve small-arc and body-sherd axis estimation.</li>
+<li>Build the Stage 1 runner (COLMAP/OpenMVS, masking, automatic marker scaling).</li>
+<li>Take the surface-fit axis method from prototype to validated.</li>
 <li>Package as a notebook or container so it runs on any machine.</li>
-<li>Decide the production path (rented GPU, per-image licence, or a Metashape licence) once funded.</li>
 </ol>
 
-<div class="pager"><span></span><a class="btn" href="how-it-works.html">How it works →</a></div>
+<div class="pager"><span></span><a class="btn" href="paths.html">CPU & GPU paths →</a></div>
 </main>
-<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0 · sample vessel: Zenodo 5102757 (CC-BY-SA-4.0)</footer></div>
+<div class="wrap"><footer>Code and docs MIT licensed · captured datasets default to CC BY-NC-SA 4.0</footer></div>
 <script src="assets/site.js"></script>
 </body>
 </html>

@@ -80,3 +80,13 @@ figcaption{color:var(--mut);font-size:.88rem;margin-top:10px}
 .pager{display:flex;justify-content:space-between;gap:12px;margin:48px 0 0;flex-wrap:wrap}
 footer{margin:56px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem;font-family:system-ui,sans-serif}
 @media (max-width:560px){.top .wrap{gap:6px}.brand{width:100%}}
+
+/* status pills + placeholders */
+.tag.todo{color:var(--mut)}
+.tag.manual{color:var(--acc2)}
+.ph{display:inline-block;min-width:64px;text-align:center;padding:1px 10px;border:1.5px dashed var(--acc);border-radius:6px;color:var(--acc);font:600 .8rem system-ui,sans-serif;background:transparent}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 18px;font:.85rem system-ui,sans-serif;color:var(--mut)}
+.path{border-top:4px solid var(--acc);margin-top:10px}
+.path.cpu{border-color:var(--acc2)}
+.cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.small{font-size:.9rem;color:var(--mut)}
